@@ -90,7 +90,7 @@ export function SurveyAnalysis({
                         return (
                           <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
                             <tspan x={viewBox.cx} y={viewBox.cy} className="fill-foreground text-3xl font-bold">{totalLeads}</tspan>
-                            <tspan x={viewBox.cx} y={(viewBox.cy || 0) + 22} className="fill-muted-foreground text-xs">Total Leads</tspan>
+                            <tspan x={viewBox.cx} y={(viewBox.cy || 0) + 22} className="fill-muted-foreground text-xs">Survey Responders</tspan>
                           </text>
                         );
                       }
@@ -117,7 +117,7 @@ export function SurveyAnalysis({
             <div className="flex flex-col gap-3">
               <div>
                 <CardTitle className="text-base font-semibold">Top Priority Call List</CardTitle>
-                <CardDescription>{filteredCallList.length} leads &mdash; sorted by qualification score</CardDescription>
+                <CardDescription>{filteredCallList.length} survey responders &mdash; sorted by qualification score</CardDescription>
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <div className="relative">
@@ -149,7 +149,7 @@ export function SurveyAnalysis({
                 </TableHeader>
                 <TableBody>
                   {filteredCallList.length === 0 ? (
-                    <TableRow><TableCell colSpan={4} className="py-8 text-center text-muted-foreground">{callSearch || tierFilter !== "all" ? "No matching leads" : "No priority leads found"}</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={4} className="py-8 text-center text-muted-foreground">{callSearch || tierFilter !== "all" ? "No matching responders" : "No priority responders found"}</TableCell></TableRow>
                   ) : filteredCallList.map((contact, i) => (
                     <TableRow key={`${contact.email}-${i}`} className="border-border/20 transition-colors hover:bg-muted/30">
                       <TableCell className="font-medium">{contact.name}</TableCell>

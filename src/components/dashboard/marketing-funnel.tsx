@@ -87,38 +87,24 @@ export function MarketingFunnel({
             <div className="space-y-4 py-2">
               {upgradeFunnel.map((step, i) => {
                 const widthPct = Math.max((step.count / funnelMax) * 100, 8);
-                const dropoff = i > 0 && upgradeFunnel[i - 1].count > 0
-                  ? (((upgradeFunnel[i - 1].count - step.count) / upgradeFunnel[i - 1].count) * 100).toFixed(1)
-                  : null;
                 return (
                   <div key={step.step} className="space-y-1.5">
                     <div className="flex items-center justify-between text-sm">
                       <span className="font-medium text-foreground">{step.step}</span>
-                      <div className="flex items-center gap-3">
-                        {dropoff && <span className="text-xs text-destructive">-{dropoff}%</span>}
-                        <span className="font-tabular font-bold">{formatNumber(step.count)}</span>
-                      </div>
+                      <span className="font-tabular font-bold">{formatNumber(step.count)}</span>
                     </div>
                     <div className="h-10 w-full overflow-hidden rounded-md bg-muted/30">
                       <div
                         className="flex h-full items-center justify-end rounded-md px-3 text-xs font-semibold transition-all duration-700"
                         style={{ width: `${widthPct}%`, backgroundColor: step.fill, color: "var(--background)" }}
                       >
-                        {((step.count / funnelMax) * 100).toFixed(0)}%
+                        {formatNumber(step.count)}
                       </div>
                     </div>
                   </div>
                 );
               })}
             </div>
-            {upgradeFunnel.length >= 2 && upgradeFunnel[0].count > 0 && (
-              <div className="mt-4 rounded-lg border border-border/30 bg-muted/20 p-3 text-center">
-                <p className="text-xs text-muted-foreground">Overall Conversion Rate</p>
-                <p className="font-tabular mt-0.5 text-xl font-bold text-primary">
-                  {((upgradeFunnel[upgradeFunnel.length - 1].count / upgradeFunnel[0].count) * 100).toFixed(1)}%
-                </p>
-              </div>
-            )}
           </CardContent>
         </Card>
 

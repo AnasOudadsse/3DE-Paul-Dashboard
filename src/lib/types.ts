@@ -95,6 +95,22 @@ export interface DayAttendanceData {
   attendees: DayAttendee[];
 }
 
+export interface CampaignActionData {
+  campaign: string;
+  freeTicket: number;
+  vipUpgrade: number;
+  upsell: number;
+  zoomReg: number;
+  total: number;
+}
+
+export interface BuyerAttributionData {
+  campaign: string;
+  productBuyers: number;
+  depositBuyers: number;
+  totalBuyers: number;
+}
+
 export interface DashboardData {
   kpis: KPIData;
   pipelineQuality: LeadTierData[];
@@ -105,8 +121,11 @@ export interface DashboardData {
   collectionList: CollectionContact[];
   deposits: DepositRecord[];
   upgradeFunnel: FunnelStep[];
-  actionSources: UTMCampaignData[];
-  trafficSources: UTMCampaignData[];
+  campaignActions: CampaignActionData[];
+  mediumBreakdown: UTMCampaignData[];
+  contentBreakdown: UTMCampaignData[];
+  termBreakdown: UTMCampaignData[];
+  buyerAttribution: BuyerAttributionData[];
   contacts: ContactRecord[];
   attendanceLogs: AttendanceRecord[];
   dayAttendance: DayAttendanceData[];

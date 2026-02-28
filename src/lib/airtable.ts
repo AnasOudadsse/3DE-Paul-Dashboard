@@ -15,6 +15,8 @@ import type {
   AttendanceRecord,
   DayAttendee,
   DayAttendanceData,
+  CampaignActionData,
+  BuyerAttributionData,
 } from "./types";
 
 const TIER_COLORS: Record<string, string> = {
@@ -223,56 +225,123 @@ async function fetchDeposits(): Promise<DepositRecord[]> {
   });
 }
 
-// ── Funnel ──
+// ── Marketing Analytics (single Action Logs fetch + buyer attribution) ──
 
-async function fetchUpgradeFunnel(): Promise<FunnelStep[]> {
-  const actions = await fetchAllRecords("Action Logs", { fields: ["Action"] });
-  const counts = { "Free Ticket": 0, "VIP Upgrade": 0, "Upsell Purchase": 0 };
-  for (const r of actions) {
-    const action = ((r.get("Action") as string) || "").toLowerCase();
-    if (action.includes("free ticket") || action.includes("got free ticket")) {
-      counts["Free Ticket"]++;
-    } else if (action.includes("vip upgrade")) {
-      counts["VIP Upgrade"]++;
-    } else if (action.includes("upsell")) {
-      counts["Upsell Purchase"]++;
-    }
-  }
-  return [
-    { step: "Free Ticket", count: counts["Free Ticket"], fill: FUNNEL_COLORS["Free Ticket"] },
-    { step: "VIP Upgrade", count: counts["VIP Upgrade"], fill: FUNNEL_COLORS["VIP Upgrade"] },
-    { step: "Upsell Purchase", count: counts["Upsell Purchase"], fill: FUNNEL_COLORS["Upsell Purchase"] },
-  ];
+interface MarketingBundle {
+  upgradeFunnel: FunnelStep[];
+  campaignActions: CampaignActionData[];
+  mediumBreakdown: UTMCampaignData[];
+  contentBreakdown: UTMCampaignData[];
+  termBreakdown: UTMCampaignData[];
+  buyerAttribution: BuyerAttributionData[];
 }
 
-async function fetchActionSources(): Promise<UTMCampaignData[]> {
-  const actions = await fetchAllRecords("Action Logs", { fields: ["Action"] });
-  const counts: Record<string, number> = {};
+async function fetchMarketingAnalytics(): Promise<MarketingBundle> {
   const palette = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
+
+  const actions = await fetchAllRecords("Action Logs", {
+    fields: ["Action", "UTM Campaign", "UTM Medium", "UTM Content", "UTM Term", "Contact"],
+  });
+
+  const funnelCounts = { "Free Ticket": 0, "VIP Upgrade": 0, "Upsell Purchase": 0 };
+  const campaignMatrix: Record<string, CampaignActionData> = {};
+  const mediumCounts: Record<string, number> = {};
+  const contentCounts: Record<string, number> = {};
+  const termCounts: Record<string, number> = {};
+  const contactUTM = new Map<string, string>();
+
   for (const r of actions) {
     const action = (r.get("Action") as string) || "Unknown";
-    counts[action] = (counts[action] || 0) + 1;
-  }
-  return Object.entries(counts)
-    .map(([campaign, count], i) => ({ campaign, count, fill: palette[i % palette.length] }))
-    .sort((a, b) => b.count - a.count);
-}
-
-async function fetchTrafficSources(): Promise<UTMCampaignData[]> {
-  const actions = await fetchAllRecords("Action Logs", {
-    fields: ["Action", "UTM Campaign"],
-    filterByFormula: 'FIND("VIP", {Action})',
-  });
-  const counts: Record<string, number> = {};
-  const palette = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
-  for (const r of actions) {
     const campaign = (r.get("UTM Campaign") as string) || "Direct / None";
-    counts[campaign] = (counts[campaign] || 0) + 1;
+    const medium = (r.get("UTM Medium") as string) || "Direct";
+    const content = (r.get("UTM Content") as string) || "";
+    const term = (r.get("UTM Term") as string) || "";
+    const contacts = (r.get("Contact") as string[]) || [];
+    const lower = action.toLowerCase();
+
+    if (lower.includes("free ticket") || lower.includes("got free ticket")) funnelCounts["Free Ticket"]++;
+    else if (lower.includes("vip upgrade")) funnelCounts["VIP Upgrade"]++;
+    else if (lower.includes("upsell")) funnelCounts["Upsell Purchase"]++;
+
+    if (!campaignMatrix[campaign]) {
+      campaignMatrix[campaign] = { campaign, freeTicket: 0, vipUpgrade: 0, upsell: 0, zoomReg: 0, total: 0 };
+    }
+    campaignMatrix[campaign].total++;
+    if (lower.includes("free ticket") || lower.includes("got free ticket")) campaignMatrix[campaign].freeTicket++;
+    else if (lower.includes("vip upgrade")) campaignMatrix[campaign].vipUpgrade++;
+    else if (lower.includes("upsell")) campaignMatrix[campaign].upsell++;
+    else if (lower.includes("zoom")) campaignMatrix[campaign].zoomReg++;
+
+    mediumCounts[medium] = (mediumCounts[medium] || 0) + 1;
+    if (content) contentCounts[content] = (contentCounts[content] || 0) + 1;
+    if (term) termCounts[term] = (termCounts[term] || 0) + 1;
+
+    for (const cid of contacts) {
+      if (!contactUTM.has(cid)) contactUTM.set(cid, campaign);
+    }
   }
-  return Object.entries(counts)
-    .map(([campaign, count], i) => ({ campaign, count, fill: palette[i % palette.length] }))
+
+  const upgradeFunnel: FunnelStep[] = [
+    { step: "Free Ticket", count: funnelCounts["Free Ticket"], fill: FUNNEL_COLORS["Free Ticket"] },
+    { step: "VIP Upgrade", count: funnelCounts["VIP Upgrade"], fill: FUNNEL_COLORS["VIP Upgrade"] },
+    { step: "Upsell Purchase", count: funnelCounts["Upsell Purchase"], fill: FUNNEL_COLORS["Upsell Purchase"] },
+  ];
+
+  const campaignActions = Object.values(campaignMatrix).sort((a, b) => b.total - a.total);
+
+  const mediumBreakdown = Object.entries(mediumCounts)
+    .map(([name, count], i) => ({ campaign: name, count, fill: palette[i % palette.length] }))
+    .sort((a, b) => b.count - a.count);
+
+  const contentBreakdown = Object.entries(contentCounts)
+    .map(([name, count], i) => ({ campaign: name, count, fill: palette[i % palette.length] }))
     .sort((a, b) => b.count - a.count)
-    .slice(0, 8);
+    .slice(0, 10);
+
+  const termBreakdown = Object.entries(termCounts)
+    .map(([name, count], i) => ({ campaign: name, count, fill: palette[i % palette.length] }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+
+  // Buyer attribution: cross-reference Sales & Deposits via contact record IDs
+  const [sales, deposits] = await Promise.all([
+    fetchAllRecords("Sales", { fields: ["Contacts"] }),
+    fetchAllRecords("Deposits", { fields: ["Contacts", "Type"] }),
+  ]);
+
+  const productByCampaign: Record<string, Set<string>> = {};
+  for (const s of sales) {
+    const cts = (s.get("Contacts") as string[]) || [];
+    for (const cid of cts) {
+      const c = contactUTM.get(cid) || "Unknown / Direct";
+      if (!productByCampaign[c]) productByCampaign[c] = new Set();
+      productByCampaign[c].add(cid);
+    }
+  }
+
+  const depositByCampaign: Record<string, Set<string>> = {};
+  for (const d of deposits) {
+    const type = (d.get("Type") as string) || "";
+    if (type === "Refund") continue;
+    const cts = (d.get("Contacts") as string[]) || [];
+    for (const cid of cts) {
+      const c = contactUTM.get(cid) || "Unknown / Direct";
+      if (!depositByCampaign[c]) depositByCampaign[c] = new Set();
+      depositByCampaign[c].add(cid);
+    }
+  }
+
+  const allCampaignKeys = new Set([...Object.keys(productByCampaign), ...Object.keys(depositByCampaign)]);
+  const buyerAttribution: BuyerAttributionData[] = Array.from(allCampaignKeys)
+    .map((campaign) => ({
+      campaign,
+      productBuyers: productByCampaign[campaign]?.size || 0,
+      depositBuyers: depositByCampaign[campaign]?.size || 0,
+      totalBuyers: (productByCampaign[campaign]?.size || 0) + (depositByCampaign[campaign]?.size || 0),
+    }))
+    .sort((a, b) => b.totalBuyers - a.totalBuyers);
+
+  return { upgradeFunnel, campaignActions, mediumBreakdown, contentBreakdown, termBreakdown, buyerAttribution };
 }
 
 // ── Contacts ──
@@ -352,6 +421,11 @@ async function safeFetch<T>(label: string, fn: () => Promise<T>, fallback: T): P
 }
 
 export async function fetchDashboardData(): Promise<DashboardData> {
+  const emptyMarketing: MarketingBundle = {
+    upgradeFunnel: [], campaignActions: [], mediumBreakdown: [],
+    contentBreakdown: [], termBreakdown: [], buyerAttribution: [],
+  };
+
   const [
     kpis,
     pipelineQuality,
@@ -361,9 +435,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     topProducts,
     collectionList,
     deposits,
-    upgradeFunnel,
-    actionSources,
-    trafficSources,
+    marketing,
     contacts,
     attendanceLogs,
     dayAttendance,
@@ -376,9 +448,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     safeFetch("TopProducts", fetchTopProducts, []),
     safeFetch("CollectionList", fetchCollectionList, []),
     safeFetch("Deposits", fetchDeposits, []),
-    safeFetch("UpgradeFunnel", fetchUpgradeFunnel, []),
-    safeFetch("ActionSources", fetchActionSources, []),
-    safeFetch("TrafficSources", fetchTrafficSources, []),
+    safeFetch("MarketingAnalytics", fetchMarketingAnalytics, emptyMarketing),
     safeFetch("Contacts", fetchContacts, []),
     safeFetch("AttendanceLogs", fetchAttendanceLogs, []),
     safeFetch("DayAttendance", fetchDayAttendance, []),
@@ -393,9 +463,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     topProducts,
     collectionList,
     deposits,
-    upgradeFunnel,
-    actionSources,
-    trafficSources,
+    ...marketing,
     contacts,
     attendanceLogs,
     dayAttendance,

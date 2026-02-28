@@ -108,8 +108,11 @@ export function DashboardShell({ data }: DashboardShellProps) {
           <TabsContent value="marketing" className="mt-6">
             <MarketingFunnel
               upgradeFunnel={data.upgradeFunnel}
-              actionSources={data.actionSources}
-              trafficSources={data.trafficSources}
+              campaignActions={data.campaignActions}
+              mediumBreakdown={data.mediumBreakdown}
+              contentBreakdown={data.contentBreakdown}
+              termBreakdown={data.termBreakdown}
+              buyerAttribution={data.buyerAttribution}
             />
           </TabsContent>
 

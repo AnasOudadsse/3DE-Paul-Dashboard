@@ -127,11 +127,7 @@ export function DashboardShell({ data }: DashboardShellProps) {
       </main>
 
       <footer className="mt-12 border-t border-border/30 py-6">
-        <div className="mx-auto max-w-[1400px] px-6">
-          <p className="text-center text-xs text-muted-foreground/60">
-            Data cached for 5 minutes &middot; Powered by Airtable &middot; Built for Walid
-          </p>
-        </div>
+        <div className="mx-auto max-w-[1400px] px-6" />
       </footer>
     </div>
   );

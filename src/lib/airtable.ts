@@ -13,6 +13,8 @@ import type {
   ObstacleData,
   ContactRecord,
   AttendanceRecord,
+  DayAttendee,
+  DayAttendanceData,
 } from "./types";
 
 const TIER_COLORS: Record<string, string> = {
@@ -313,6 +315,31 @@ async function fetchAttendanceLogs(): Promise<AttendanceRecord[]> {
   });
 }
 
+async function fetchDayAttendance(): Promise<DayAttendanceData[]> {
+  const tables = [
+    { day: 1, table: "Unique Event Attendees day 1", label: "Day 1" },
+    { day: 2, table: "Unique Event Attendees day 2", label: "Day 2" },
+    { day: 3, table: "Unique Event Attendees day 3", label: "Day 3" },
+  ];
+
+  const dayResults = await Promise.all(
+    tables.map(async ({ day, table, label }) => {
+      const records = await fetchAllRecords(table, {
+        fields: ["Guest Email", "Total Watch Time in Minutes", "Lead Score", "Total Watch Time"],
+      });
+      const attendees: DayAttendee[] = records.map((r) => ({
+        guestEmail: (r.get("Guest Email") as string) || "—",
+        watchTimeMinutes: (r.get("Total Watch Time in Minutes") as number) || 0,
+        watchTimeFormatted: (r.get("Total Watch Time") as string) || "0m",
+        leadScore: (r.get("Lead Score") as string) || "Unknown",
+      }));
+      return { day, label, attendees } satisfies DayAttendanceData;
+    })
+  );
+
+  return dayResults.sort((a, b) => a.day - b.day);
+}
+
 // ── Orchestrator ──
 
 async function safeFetch<T>(label: string, fn: () => Promise<T>, fallback: T): Promise<T> {
@@ -339,6 +366,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     trafficSources,
     contacts,
     attendanceLogs,
+    dayAttendance,
   ] = await Promise.all([
     safeFetch("KPIs", fetchKPIs, { depositRevenue: 0, productRevenue: 0, totalRevenue: 0 }),
     safeFetch("PipelineQuality", fetchPipelineQuality, []),
@@ -353,6 +381,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     safeFetch("TrafficSources", fetchTrafficSources, []),
     safeFetch("Contacts", fetchContacts, []),
     safeFetch("AttendanceLogs", fetchAttendanceLogs, []),
+    safeFetch("DayAttendance", fetchDayAttendance, []),
   ]);
 
   return {
@@ -369,6 +398,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     trafficSources,
     contacts,
     attendanceLogs,
+    dayAttendance,
     lastUpdated: new Date().toISOString(),
   };
 }

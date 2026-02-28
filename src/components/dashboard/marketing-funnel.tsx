@@ -27,11 +27,11 @@ const actionConfig: ChartConfig = {
 
 export function MarketingFunnel({
   upgradeFunnel,
-  actionSources,
+  actionSources = [],
   trafficSources,
 }: MarketingFunnelProps) {
   const funnelMax = upgradeFunnel[0]?.count || 1;
-  const actionTotal = useMemo(() => actionSources.reduce((s, a) => s + a.count, 0), [actionSources]);
+  const actionTotal = useMemo(() => (actionSources ?? []).reduce((s, a) => s + a.count, 0), [actionSources]);
 
   return (
     <div className="space-y-6">

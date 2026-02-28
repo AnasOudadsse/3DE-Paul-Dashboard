@@ -118,7 +118,7 @@ export function DashboardShell({ data }: DashboardShellProps) {
           </TabsContent>
 
           <TabsContent value="attendance" className="mt-6">
-            <AttendanceTab attendanceLogs={data.attendanceLogs} />
+            <AttendanceTab attendanceLogs={data.attendanceLogs} dayAttendance={data.dayAttendance} />
           </TabsContent>
         </Tabs>
       </main>

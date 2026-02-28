@@ -82,6 +82,19 @@ export interface AttendanceRecord {
   meetingName: string;
 }
 
+export interface DayAttendee {
+  guestEmail: string;
+  watchTimeMinutes: number;
+  watchTimeFormatted: string;
+  leadScore: string;
+}
+
+export interface DayAttendanceData {
+  day: number;
+  label: string;
+  attendees: DayAttendee[];
+}
+
 export interface DashboardData {
   kpis: KPIData;
   pipelineQuality: LeadTierData[];
@@ -96,5 +109,6 @@ export interface DashboardData {
   trafficSources: UTMCampaignData[];
   contacts: ContactRecord[];
   attendanceLogs: AttendanceRecord[];
+  dayAttendance: DayAttendanceData[];
   lastUpdated: string;
 }

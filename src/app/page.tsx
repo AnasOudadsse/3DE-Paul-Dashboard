@@ -36,6 +36,7 @@ export default async function DashboardPage() {
       trafficSources: [],
       contacts: [],
       attendanceLogs: [],
+      dayAttendance: [],
       lastUpdated: new Date().toISOString(),
     };
   }

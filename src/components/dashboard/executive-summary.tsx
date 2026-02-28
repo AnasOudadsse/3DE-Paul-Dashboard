@@ -68,8 +68,8 @@ export function SurveyAnalysis({
   }, [priorityCallList, tierFilter, callSearch]);
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-5">
         {/* Pipeline Quality Donut */}
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm lg:col-span-2">
           <CardHeader className="pb-2">
@@ -123,7 +123,7 @@ export function SurveyAnalysis({
                 <div className="relative">
                   <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                   <input type="text" placeholder="Search name, email, phone..." value={callSearch} onChange={(e) => setCallSearch(e.target.value)}
-                    className="h-8 w-[200px] rounded-md border border-border bg-background pl-8 pr-3 text-xs outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring" />
+                    className="h-8 w-full rounded-md border border-border bg-background pl-8 pr-3 text-xs outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring xs:w-[200px]" />
                 </div>
                 <Select value={tierFilter} onValueChange={setTierFilter}>
                   <SelectTrigger className="h-8 w-[130px] text-xs"><SelectValue placeholder="Tier" /></SelectTrigger>
@@ -180,7 +180,7 @@ export function SurveyAnalysis({
             <ChartContainer config={painPointConfig} className="h-[320px] w-full">
               <BarChart data={audiencePainPoints} layout="vertical" accessibilityLayer>
                 <CartesianGrid horizontal={false} strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.5} />
-                <YAxis dataKey="obstacle" type="category" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} width={160} tickFormatter={(v: string) => v.length > 22 ? v.slice(0, 22) + "..." : v} />
+                <YAxis dataKey="obstacle" type="category" tickLine={false} axisLine={false} tick={{ fontSize: 10 }} width={100} tickFormatter={(v: string) => v.length > 14 ? v.slice(0, 14) + "…" : v} />
                 <XAxis type="number" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} />
                 <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
                 <Bar dataKey="count" radius={[0, 6, 6, 0]} maxBarSize={28}>

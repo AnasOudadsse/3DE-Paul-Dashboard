@@ -57,9 +57,9 @@ export function MarketingFunnel({
   const totalDepositBuyers = useMemo(() => buyerAttribution.reduce((s, b) => s + b.depositBuyers, 0), [buyerAttribution]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Summary KPIs */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
         {[
           { label: "Total Actions", value: formatNumber(totalActions), color: "text-foreground" },
           { label: "UTM Sources", value: formatNumber(mediumBreakdown.length), color: "text-blue-600 dark:text-blue-400" },
@@ -182,7 +182,7 @@ export function MarketingFunnel({
               Action breakdown by UTM campaign &mdash; {campaignActions.length} campaigns, {formatNumber(totalActions)} total actions
             </CardDescription>
           </CardHeader>
-          <CardContent>
+            <CardContent className="px-3 sm:px-6">
             <div className="max-h-[420px] overflow-auto rounded-md border border-border/30">
               <Table>
                 <TableHeader>
@@ -247,9 +247,9 @@ export function MarketingFunnel({
                       type="category"
                       tickLine={false}
                       axisLine={false}
-                      width={120}
-                      tick={{ fontSize: 11 }}
-                      tickFormatter={(v: string) => v.length > 18 ? v.slice(0, 18) + "…" : v}
+                      width={80}
+                      tick={{ fontSize: 10 }}
+                      tickFormatter={(v: string) => v.length > 12 ? v.slice(0, 12) + "…" : v}
                     />
                     <XAxis type="number" tickLine={false} axisLine={false} />
                     <ChartTooltip content={<ChartTooltipContent />} />
@@ -280,9 +280,9 @@ export function MarketingFunnel({
                       type="category"
                       tickLine={false}
                       axisLine={false}
-                      width={120}
-                      tick={{ fontSize: 11 }}
-                      tickFormatter={(v: string) => v.length > 18 ? v.slice(0, 18) + "…" : v}
+                      width={80}
+                      tick={{ fontSize: 10 }}
+                      tickFormatter={(v: string) => v.length > 12 ? v.slice(0, 12) + "…" : v}
                     />
                     <XAxis type="number" tickLine={false} axisLine={false} />
                     <ChartTooltip content={<ChartTooltipContent />} />
@@ -309,17 +309,17 @@ export function MarketingFunnel({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={attributionConfig} className="h-[300px] w-full">
+            <ChartContainer config={attributionConfig} className="h-[260px] w-full sm:h-[300px]">
               <BarChart data={buyerAttribution.slice(0, 10)} accessibilityLayer>
                 <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis
                   dataKey="campaign"
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fontSize: 10 }}
-                  tickFormatter={(v: string) => v.length > 14 ? v.slice(0, 14) + "…" : v}
+                  tick={{ fontSize: 9 }}
+                  tickFormatter={(v: string) => v.length > 10 ? v.slice(0, 10) + "…" : v}
                   interval={0}
-                  angle={-20}
+                  angle={-30}
                   textAnchor="end"
                   height={60}
                 />
@@ -341,7 +341,7 @@ export function MarketingFunnel({
             </div>
 
             {/* Attribution Table */}
-            <div className="mt-4 max-h-[320px] overflow-auto rounded-md border border-border/30">
+            <div className="mt-4 max-h-[320px] overflow-auto rounded-md border border-border/30 text-sm">
               <Table>
                 <TableHeader>
                   <TableRow className="border-border/30 hover:bg-transparent">

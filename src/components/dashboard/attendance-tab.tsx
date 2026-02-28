@@ -223,9 +223,9 @@ export function AttendanceTab({ attendanceLogs: _logs, dayAttendance = [] }: Att
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Top-Level KPI Cards */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6">
         {[
           { label: "Unique Attendees", value: formatNumber(totalUniqueAttendees), icon: Users, color: "text-foreground" },
           { label: "Day 1", value: formatNumber(dayStats[0]?.total || 0), icon: Users, color: "text-blue-600 dark:text-blue-400" },
@@ -247,7 +247,7 @@ export function AttendanceTab({ attendanceLogs: _logs, dayAttendance = [] }: Att
       </div>
 
       {/* Watch Time Summary Cards */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
         {[
           { label: "Total Watch Time", value: formatDuration(grandTotalMinutes), color: "text-emerald-600 dark:text-emerald-400" },
           { label: "Avg Watch Time / Person", value: formatDuration(grandAvgMinutes), color: "text-amber-600 dark:text-amber-400" },
@@ -267,7 +267,7 @@ export function AttendanceTab({ attendanceLogs: _logs, dayAttendance = [] }: Att
       </div>
 
       {/* Charts Row 1: Attendance by Day + Retention Funnel */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
         {/* Attendance by Day Bar Chart */}
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
           <CardHeader className="pb-2">
@@ -352,7 +352,7 @@ export function AttendanceTab({ attendanceLogs: _logs, dayAttendance = [] }: Att
       </div>
 
       {/* Charts Row 2: Lead Score by Day + Overall Lead Score Donut */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
         {/* Lead Score Distribution by Day - Stacked Bar */}
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
           <CardHeader className="pb-2">
@@ -458,15 +458,15 @@ export function AttendanceTab({ attendanceLogs: _logs, dayAttendance = [] }: Att
                 {filteredAttendees.length} of {combinedAttendees.length} unique attendees across all days
               </CardDescription>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="relative">
+            <div className="flex flex-col gap-2 xs:flex-row xs:flex-wrap xs:items-center">
+              <div className="relative w-full xs:w-auto">
                 <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="text"
                   placeholder="Search email..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="h-8 w-[200px] rounded-md border border-border bg-background pl-8 pr-3 text-xs outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring"
+                  className="h-8 w-full rounded-md border border-border bg-background pl-8 pr-3 text-xs outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring xs:w-[200px]"
                 />
               </div>
               <div className="flex gap-1">
@@ -474,13 +474,13 @@ export function AttendanceTab({ attendanceLogs: _logs, dayAttendance = [] }: Att
                   <button
                     key={d}
                     onClick={() => setDayFilter(d)}
-                    className={`h-8 rounded-md px-3 text-xs font-medium transition-colors ${
+                    className={`h-8 flex-1 rounded-md px-2 text-xs font-medium transition-colors xs:flex-none xs:px-3 ${
                       dayFilter === d
                         ? "bg-primary text-primary-foreground shadow-sm"
                         : "bg-muted/40 text-muted-foreground hover:bg-muted"
                     }`}
                   >
-                    {d === "all" ? "All Days" : `Day ${d}`}
+                    {d === "all" ? "All" : `Day ${d}`}
                   </button>
                 ))}
               </div>
@@ -492,13 +492,13 @@ export function AttendanceTab({ attendanceLogs: _logs, dayAttendance = [] }: Att
             <Table>
               <TableHeader>
                 <TableRow className="border-border/30 hover:bg-transparent">
-                  <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Email</TableHead>
+                  <TableHead className="min-w-[140px] text-xs font-semibold uppercase tracking-wider text-muted-foreground">Email</TableHead>
                   <TableHead className="text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Days</TableHead>
-                  <TableHead className="text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Day 1</TableHead>
-                  <TableHead className="text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Day 2</TableHead>
-                  <TableHead className="text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Day 3</TableHead>
+                  <TableHead className="hidden text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground sm:table-cell">Day 1</TableHead>
+                  <TableHead className="hidden text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground sm:table-cell">Day 2</TableHead>
+                  <TableHead className="hidden text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground sm:table-cell">Day 3</TableHead>
                   <TableHead className="text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Total</TableHead>
-                  <TableHead className="text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Best Score</TableHead>
+                  <TableHead className="text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">Score</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -515,19 +515,19 @@ export function AttendanceTab({ attendanceLogs: _logs, dayAttendance = [] }: Att
                       <TableCell className="text-center">
                         <span className="font-tabular text-sm font-bold text-foreground">{attendee.daysAttended}/3</span>
                       </TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="hidden text-center sm:table-cell">
                         <span className={`inline-flex items-center gap-1 font-tabular text-sm ${attendee.day1 > 0 ? "text-foreground" : "text-muted-foreground/40"}`}>
                           <Clock className="h-3 w-3" />
                           {attendee.day1 > 0 ? formatDuration(attendee.day1) : "—"}
                         </span>
                       </TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="hidden text-center sm:table-cell">
                         <span className={`inline-flex items-center gap-1 font-tabular text-sm ${attendee.day2 > 0 ? "text-foreground" : "text-muted-foreground/40"}`}>
                           <Clock className="h-3 w-3" />
                           {attendee.day2 > 0 ? formatDuration(attendee.day2) : "—"}
                         </span>
                       </TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="hidden text-center sm:table-cell">
                         <span className={`inline-flex items-center gap-1 font-tabular text-sm ${attendee.day3 > 0 ? "text-foreground" : "text-muted-foreground/40"}`}>
                           <Clock className="h-3 w-3" />
                           {attendee.day3 > 0 ? formatDuration(attendee.day3) : "—"}

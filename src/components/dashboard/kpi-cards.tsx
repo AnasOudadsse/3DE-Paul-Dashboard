@@ -41,7 +41,7 @@ const kpiConfig = [
 
 export function KPICards({ data }: KPICardsProps) {
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+    <div className="grid grid-cols-1 gap-3 xs:grid-cols-3 sm:gap-4">
       {kpiConfig.map((kpi) => {
         const Icon = kpi.icon;
         return (
@@ -49,15 +49,15 @@ export function KPICards({ data }: KPICardsProps) {
             key={kpi.key}
             className={`relative overflow-hidden border ${kpi.borderAccent} bg-card/80 backdrop-blur-sm`}
           >
-            <CardContent className="flex items-center gap-4 p-6">
-              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${kpi.bgAccent}`}>
-                <Icon className={`h-5 w-5 ${kpi.accent}`} />
+            <CardContent className="flex items-center gap-3 p-4 sm:gap-4 sm:p-6">
+              <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl sm:h-12 sm:w-12 ${kpi.bgAccent}`}>
+                <Icon className={`h-4 w-4 sm:h-5 sm:w-5 ${kpi.accent}`} />
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground sm:text-xs">
                   {kpi.label}
                 </p>
-                <p className="font-tabular mt-1 text-2xl font-bold tracking-tight text-foreground">
+                <p className="font-tabular mt-0.5 text-xl font-bold tracking-tight text-foreground sm:mt-1 sm:text-2xl">
                   {kpi.format(data[kpi.key])}
                 </p>
               </div>

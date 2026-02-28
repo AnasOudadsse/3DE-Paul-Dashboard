@@ -13,6 +13,8 @@
     format("woff2");
 }
 
+@custom-variant xs (@media (width >= 480px));
+
 @theme inline {
   --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
 

@@ -36,6 +36,13 @@ export interface CollectionContact {
   balance: number;
 }
 
+export interface DepositRecord {
+  name: string;
+  amount: number;
+  type: string;
+  date: string;
+}
+
 export interface FunnelStep {
   step: string;
   count: number;
@@ -60,6 +67,7 @@ export interface DashboardData {
   salesVelocity: SalesVelocityPoint[];
   topProducts: ProductPerformance[];
   collectionList: CollectionContact[];
+  deposits: DepositRecord[];
   upgradeFunnel: FunnelStep[];
   trafficSources: UTMCampaignData[];
   audiencePainPoints: ObstacleData[];

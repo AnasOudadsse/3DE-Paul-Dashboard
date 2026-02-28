@@ -16,19 +16,16 @@ export default async function DashboardPage() {
 
   try {
     data = await getCachedData();
-  } catch {
+  } catch (err) {
+    console.error("[Dashboard] Top-level fetch failed:", err);
     data = {
       kpis: { totalRevenue: 0, outstandingPipeline: 0, totalUpfrontSales: 0 },
-      pipelineQuality: [
-        { tier: "Tier A", count: 24, fill: "var(--color-tierA)" },
-        { tier: "Tier B", count: 58, fill: "var(--color-tierB)" },
-        { tier: "Tier C", count: 89, fill: "var(--color-tierC)" },
-        { tier: "Tier D", count: 31, fill: "var(--color-tierD)" },
-      ],
+      pipelineQuality: [],
       priorityCallList: [],
       salesVelocity: [],
       topProducts: [],
       collectionList: [],
+      deposits: [],
       upgradeFunnel: [
         { step: "Free Ticket", count: 0, fill: "var(--color-freeTicket)" },
         { step: "VIP Upgrade", count: 0, fill: "var(--color-vipUpgrade)" },

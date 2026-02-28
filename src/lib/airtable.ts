@@ -6,6 +6,7 @@ import type {
   SalesVelocityPoint,
   ProductPerformance,
   CollectionContact,
+  DepositRecord,
   FunnelStep,
   UTMCampaignData,
   ObstacleData,
@@ -89,13 +90,13 @@ async function fetchKPIs() {
   }
 
   const contacts = await fetchAllRecords("Contacts", {
-    fields: ["Total Balance"],
-    filterByFormula: "{Total Balance} > 0",
+    fields: ["Total balance"],
+    filterByFormula: "{Total balance} > 0",
   });
 
   let outstandingPipeline = 0;
   for (const record of contacts) {
-    outstandingPipeline += (record.get("Total Balance") as number) || 0;
+    outstandingPipeline += (record.get("Total balance") as number) || 0;
   }
 
   const sales = await fetchAllRecords("Sales", {
@@ -144,10 +145,7 @@ async function fetchPriorityCallList(): Promise<PriorityContact[]> {
     fields: ["Email", "Base Score", "Lead Tier"],
   });
 
-  const surveyMap = new Map<
-    string,
-    { score: number; tier: string }
-  >();
+  const surveyMap = new Map<string, { score: number; tier: string }>();
   for (const record of surveys) {
     const email = (record.get("Email") as string) || "";
     const rawTier = (record.get("Lead Tier") as string) || "";
@@ -233,8 +231,8 @@ async function fetchTopProducts(): Promise<ProductPerformance[]> {
 
 async function fetchCollectionList(): Promise<CollectionContact[]> {
   const contacts = await fetchAllRecords("Contacts", {
-    fields: ["Full Name", "Phone", "Email", "Total Balance"],
-    filterByFormula: "{Total Balance} > 0",
+    fields: ["Full Name", "Phone", "Email", "Total balance"],
+    filterByFormula: "{Total balance} > 0",
   });
 
   return contacts
@@ -242,9 +240,26 @@ async function fetchCollectionList(): Promise<CollectionContact[]> {
       name: (record.get("Full Name") as string) || "Unknown",
       phone: (record.get("Phone") as string) || "—",
       email: (record.get("Email") as string) || "—",
-      balance: (record.get("Total Balance") as number) || 0,
+      balance: (record.get("Total balance") as number) || 0,
     }))
     .sort((a, b) => b.balance - a.balance);
+}
+
+async function fetchDeposits(): Promise<DepositRecord[]> {
+  const deposits = await fetchAllRecords("Deposits", {
+    fields: ["Amount", "Type", "Date", "Contacts"],
+  });
+
+  return deposits.map((record) => {
+    const contactField = record.get("Contacts");
+    const contactName = Array.isArray(contactField) ? String(contactField[0]) : "";
+    return {
+      name: contactName || "—",
+      amount: (record.get("Amount") as number) || 0,
+      type: (record.get("Type") as string) || "Unknown",
+      date: (record.get("Date") as string) || "",
+    };
+  });
 }
 
 async function fetchUpgradeFunnel(): Promise<FunnelStep[]> {
@@ -260,11 +275,12 @@ async function fetchUpgradeFunnel(): Promise<FunnelStep[]> {
 
   for (const record of actions) {
     const action = (record.get("Action") as string) || "";
-    if (action.toLowerCase().includes("free ticket") || action.toLowerCase().includes("got free ticket")) {
+    const lower = action.toLowerCase();
+    if (lower.includes("free ticket") || lower.includes("got free ticket")) {
       stepCounts["Free Ticket"]++;
-    } else if (action.toLowerCase().includes("vip upgrade") || action.toLowerCase().includes("upsell")) {
+    } else if (lower.includes("vip upgrade") || lower.includes("upsell")) {
       stepCounts["VIP Upgrade"]++;
-    } else if (action.toLowerCase().includes("zoom registration") || action.toLowerCase().includes("zoom")) {
+    } else if (lower.includes("zoom registration") || lower.includes("zoom")) {
       stepCounts["Zoom Registration"]++;
     }
   }
@@ -322,6 +338,15 @@ async function fetchAudiencePainPoints(): Promise<ObstacleData[]> {
     .sort((a, b) => b.count - a.count);
 }
 
+async function safeFetch<T>(label: string, fn: () => Promise<T>, fallback: T): Promise<T> {
+  try {
+    return await fn();
+  } catch (err) {
+    console.error(`[Airtable] FAILED: "${label}"`, err);
+    return fallback;
+  }
+}
+
 export async function fetchDashboardData(): Promise<DashboardData> {
   const [
     kpis,
@@ -330,19 +355,21 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     salesVelocity,
     topProducts,
     collectionList,
+    deposits,
     upgradeFunnel,
     trafficSources,
     audiencePainPoints,
   ] = await Promise.all([
-    fetchKPIs(),
-    fetchPipelineQuality(),
-    fetchPriorityCallList(),
-    fetchSalesVelocity(),
-    fetchTopProducts(),
-    fetchCollectionList(),
-    fetchUpgradeFunnel(),
-    fetchTrafficSources(),
-    fetchAudiencePainPoints(),
+    safeFetch("KPIs", fetchKPIs, { totalRevenue: 0, outstandingPipeline: 0, totalUpfrontSales: 0 }),
+    safeFetch("PipelineQuality", fetchPipelineQuality, []),
+    safeFetch("PriorityCallList", fetchPriorityCallList, []),
+    safeFetch("SalesVelocity", fetchSalesVelocity, []),
+    safeFetch("TopProducts", fetchTopProducts, []),
+    safeFetch("CollectionList", fetchCollectionList, []),
+    safeFetch("Deposits", fetchDeposits, []),
+    safeFetch("UpgradeFunnel", fetchUpgradeFunnel, []),
+    safeFetch("TrafficSources", fetchTrafficSources, []),
+    safeFetch("AudiencePainPoints", fetchAudiencePainPoints, []),
   ]);
 
   return {
@@ -352,6 +379,7 @@ export async function fetchDashboardData(): Promise<DashboardData> {
     salesVelocity,
     topProducts,
     collectionList,
+    deposits,
     upgradeFunnel,
     trafficSources,
     audiencePainPoints,

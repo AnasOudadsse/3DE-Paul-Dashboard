@@ -90,6 +90,7 @@ export function DashboardShell({ data }: DashboardShellProps) {
               salesVelocity={data.salesVelocity}
               topProducts={data.topProducts}
               collectionList={data.collectionList}
+              deposits={data.deposits}
             />
           </TabsContent>
 

@@ -62,7 +62,7 @@ export function MarketingFunnel({
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Upgrade Funnel */}
-        <Card className="border-border/50 bg-card/60 backdrop-blur-sm">
+        <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-semibold">
               The Upgrade Funnel
@@ -138,7 +138,7 @@ export function MarketingFunnel({
         </Card>
 
         {/* High-Value Traffic */}
-        <Card className="border-border/50 bg-card/60 backdrop-blur-sm">
+        <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-semibold">
               High-Value Traffic
@@ -210,7 +210,7 @@ export function MarketingFunnel({
       </div>
 
       {/* Audience Pain Points */}
-      <Card className="border-border/50 bg-card/60 backdrop-blur-sm">
+      <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
         <CardHeader className="pb-2">
           <CardTitle className="text-base font-semibold">
             Audience Pain Points

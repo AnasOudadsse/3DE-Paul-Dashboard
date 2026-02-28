@@ -1,7 +1,7 @@
 export interface KPIData {
+  depositRevenue: number;
+  productRevenue: number;
   totalRevenue: number;
-  outstandingPipeline: number;
-  totalUpfrontSales: number;
 }
 
 export interface LeadTierData {
@@ -60,16 +60,41 @@ export interface ObstacleData {
   count: number;
 }
 
+export interface ContactRecord {
+  name: string;
+  email: string;
+  phone: string;
+  totalDeposits: number;
+  totalRemaining: number;
+  totalRefunds: number;
+  totalBalance: number;
+  registrations: number;
+}
+
+export interface AttendanceRecord {
+  guestName: string;
+  guestEmail: string;
+  joinTime: string;
+  leaveTime: string;
+  durationMinutes: number;
+  action: string;
+  engagementType: string;
+  meetingName: string;
+}
+
 export interface DashboardData {
   kpis: KPIData;
   pipelineQuality: LeadTierData[];
   priorityCallList: PriorityContact[];
+  audiencePainPoints: ObstacleData[];
   salesVelocity: SalesVelocityPoint[];
   topProducts: ProductPerformance[];
   collectionList: CollectionContact[];
   deposits: DepositRecord[];
   upgradeFunnel: FunnelStep[];
+  actionSources: UTMCampaignData[];
   trafficSources: UTMCampaignData[];
-  audiencePainPoints: ObstacleData[];
+  contacts: ContactRecord[];
+  attendanceLogs: AttendanceRecord[];
   lastUpdated: string;
 }

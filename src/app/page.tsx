@@ -19,9 +19,10 @@ export default async function DashboardPage() {
   } catch (err) {
     console.error("[Dashboard] Top-level fetch failed:", err);
     data = {
-      kpis: { totalRevenue: 0, outstandingPipeline: 0, totalUpfrontSales: 0 },
+      kpis: { depositRevenue: 0, productRevenue: 0, totalRevenue: 0 },
       pipelineQuality: [],
       priorityCallList: [],
+      audiencePainPoints: [],
       salesVelocity: [],
       topProducts: [],
       collectionList: [],
@@ -29,10 +30,12 @@ export default async function DashboardPage() {
       upgradeFunnel: [
         { step: "Free Ticket", count: 0, fill: "var(--color-freeTicket)" },
         { step: "VIP Upgrade", count: 0, fill: "var(--color-vipUpgrade)" },
-        { step: "Zoom Registration", count: 0, fill: "var(--color-zoomReg)" },
+        { step: "Upsell Purchase", count: 0, fill: "var(--color-zoomReg)" },
       ],
+      actionSources: [],
       trafficSources: [],
-      audiencePainPoints: [],
+      contacts: [],
+      attendanceLogs: [],
       lastUpdated: new Date().toISOString(),
     };
   }

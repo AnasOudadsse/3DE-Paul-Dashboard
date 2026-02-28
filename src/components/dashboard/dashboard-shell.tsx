@@ -49,14 +49,14 @@ export function DashboardShell({ data }: DashboardShellProps) {
           <KPICards data={data.kpis} />
         </div>
 
-        <Tabs defaultValue="survey" className="space-y-6">
+        <Tabs defaultValue="contacts" className="space-y-6">
           <TabsList className="inline-flex h-10 items-center gap-1 overflow-x-auto rounded-xl border border-border/40 bg-muted/30 p-1 backdrop-blur-sm">
             <TabsTrigger
-              value="survey"
+              value="contacts"
               className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
             >
-              <ClipboardList className="h-3.5 w-3.5" />
-              Survey Analysis
+              <Users className="h-3.5 w-3.5" />
+              Contacts
             </TabsTrigger>
             <TabsTrigger
               value="sales"
@@ -73,27 +73,23 @@ export function DashboardShell({ data }: DashboardShellProps) {
               Marketing Funnel
             </TabsTrigger>
             <TabsTrigger
-              value="contacts"
-              className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
-            >
-              <Users className="h-3.5 w-3.5" />
-              Contacts
-            </TabsTrigger>
-            <TabsTrigger
               value="attendance"
               className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
             >
               <CalendarCheck className="h-3.5 w-3.5" />
               Attendance
             </TabsTrigger>
+            <TabsTrigger
+              value="survey"
+              className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+            >
+              <ClipboardList className="h-3.5 w-3.5" />
+              Survey Analysis
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="survey" className="mt-6">
-            <SurveyAnalysis
-              pipelineQuality={data.pipelineQuality}
-              priorityCallList={data.priorityCallList}
-              audiencePainPoints={data.audiencePainPoints}
-            />
+          <TabsContent value="contacts" className="mt-6">
+            <ContactsTab contacts={data.contacts} />
           </TabsContent>
 
           <TabsContent value="sales" className="mt-6">
@@ -116,12 +112,16 @@ export function DashboardShell({ data }: DashboardShellProps) {
             />
           </TabsContent>
 
-          <TabsContent value="contacts" className="mt-6">
-            <ContactsTab contacts={data.contacts} />
-          </TabsContent>
-
           <TabsContent value="attendance" className="mt-6">
             <AttendanceTab attendanceLogs={data.attendanceLogs} dayAttendance={data.dayAttendance} />
+          </TabsContent>
+
+          <TabsContent value="survey" className="mt-6">
+            <SurveyAnalysis
+              pipelineQuality={data.pipelineQuality}
+              priorityCallList={data.priorityCallList}
+              audiencePainPoints={data.audiencePainPoints}
+            />
           </TabsContent>
         </Tabs>
       </main>
